@@ -9,14 +9,27 @@ let savedBirds = [];
 let pipes = [];
 let counter = 1;
 let slider;
+let saveButton;
+let runButton;
+let trainButton;
+
+let trainMode = true;
 
 function setup() {
     createCanvas(640, 480);
+    saveButton = createButton("Save");
+    saveButton.mouseClicked(saveOneBird)
+    runButton = createButton("Run Bird");
+    runButton.mouseClicked(runBird)
+    trainButton = createButton("Train");
+    trainButton.mouseClicked(() => location.reload())
+
     slider = createSlider(1, 1000, 1);
 
     for (let i = 0; i < TOTAL; i++) {
         birds[i] = new Bird();
     }
+    
     pipes.push(new Pipe());
 }
 
@@ -64,10 +77,12 @@ function logic() {
         bird.update();
     }
 
-    if (birds.length == 0) {
-        counter = 0;
-        nextGeneration()
-        pipes = []
+    if (trainMode) {
+        if (birds.length == 0) {
+            counter = 0;
+            nextGeneration()
+            pipes = []
+        }
     }
 
     if (counter % 150 == 0) {
@@ -83,3 +98,21 @@ function logic() {
 //         //console.log("SPACE");
 //     }
 // }
+
+function saveOneBird() {
+    let bird = birds[0];
+    let json = bird.brain.serialize();
+
+    localStorage.setItem("bird", json);
+    console.log("Saved");
+}
+
+function runBird() {
+    let json = localStorage.getItem("bird");
+    let bird = new Bird();
+    bird.brain = NeuralNetwork.deserialize(json);
+    birds = [bird];
+    pipes = [];
+    pipes.push(new Pipe());
+    trainMode = false;
+}
