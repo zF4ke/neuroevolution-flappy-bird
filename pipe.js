@@ -4,7 +4,7 @@
 // Code for: https://youtu.be/cXgA1d_E-jY&
 
 function Pipe() {
-    this.spacing = 175;
+    this.spacing = 125;
     this.top = random(height / 6, 3 / 4 * height);
     this.bottom = height - (this.top + this.spacing);
     this.x = width;
@@ -14,8 +14,8 @@ function Pipe() {
     this.highlight = false;
   
     this.hits = function(bird) {
-        if (bird.y < this.top || bird.y > height - this.bottom) {
-            if (bird.x > this.x && bird.x < this.x + this.w) {
+        if (bird.y - bird.h/2 <= this.top || bird.y >= height - this.bottom - bird.h/2) {
+            if (bird.x >= this.x && bird.x <= this.x + this.w) {
                 this.highlight = true;
                 return true;
             }

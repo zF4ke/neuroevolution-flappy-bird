@@ -3,14 +3,17 @@
 // http://patreon.com/codingtrain
 // Code for: https://youtu.be/cXgA1d_E-jY&
 
-const TOTAL = 300;
+const TOTAL = 500;
 let birds = [];
 let savedBirds = [];
 let pipes = [];
 let counter = 1;
+let slider;
 
 function setup() {
     createCanvas(640, 480);
+    slider = createSlider(1, 1000, 1);
+
     for (let i = 0; i < TOTAL; i++) {
         birds[i] = new Bird();
     }
@@ -18,10 +21,23 @@ function setup() {
 }
 
 function draw() {
+    for (let n = 0; n < slider.value(); n++) {
+        logic();
+    }
+
     background(0);
 
+    for (let bird of birds) {
+        bird.show()
+    }
+
+    for (let pipe of pipes) {
+        pipe.show()
+    }
+}
+
+function logic() {
     for (let i = pipes.length - 1; i >= 0; i--) {
-        pipes[i].show();
         pipes[i].update();
 
         for (let j = 0; j < birds.length; j++) {
@@ -36,10 +52,16 @@ function draw() {
         }
     }
 
+    for (let i = 0; i < birds.length; i++) {
+        if (birds[i].offscreen()) {
+            savedBirds.push(birds[i]);
+            birds.splice(i, 1)
+        }
+    }
+
     for (let bird of birds) {
         bird.think(pipes);
         bird.update();
-        bird.show();
     }
 
     if (birds.length == 0) {

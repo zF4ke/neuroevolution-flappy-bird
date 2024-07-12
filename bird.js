@@ -8,6 +8,7 @@
 function Bird(brain) {
     this.y = height/2;
     this.x = 64;
+    this.h = 32
   
     this.gravity = 0.1;
     this.lift = -4;
@@ -19,19 +20,20 @@ function Bird(brain) {
     if (brain) {
         this.brain = brain.copy();
     } else {   
-        this.brain = new NeuralNetwork(4, 4, 1);
+        this.brain = new NeuralNetwork(5, 4, 1);
     }
 
     this.think = function(pipes) {
         closest = this.findClosestPipe(pipes);
 
-        //closest.highlight = true;
+        closest.highlight = true;
 
         let inputs = [];
         inputs[0] = this.y / height;
         inputs[1] = closest.top / height;
         inputs[2] = closest.bottom / height;
         inputs[3] = closest.x / width;
+        inputs[4] = this.velocity / 10;
 
         let output = this.brain.predict(inputs);
 
@@ -46,7 +48,7 @@ function Bird(brain) {
 
         for (let i = 0; i < pipes.length; i++) {
 
-            let d = pipes[i].x - this.x
+            let d = (pipes[i].x + pipes[i].w) - this.x
 
             if (d < closestDistance && d > 0) {
                 closest = pipes[i]
@@ -55,6 +57,10 @@ function Bird(brain) {
         }
 
         return closest;
+    }
+
+    this.offscreen = function() {
+        return this.y > height || this.y < 0;
     }
 
     this.mutate = function () {
@@ -68,16 +74,6 @@ function Bird(brain) {
         this.velocity += this.gravity;
         // this.velocity *= 0.9;
         this.y += this.velocity;
-    
-        if (this.y > height) {
-            this.y = height;
-            this.velocity = 0;
-        }
-    
-        if (this.y < 0) {
-            this.y = 0;
-            this.velocity = 0;
-        }
     }
   
     this.show = function() {
